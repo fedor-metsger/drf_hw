@@ -1,10 +1,12 @@
 
 from django.db import models
 
+from config import settings
 from users.models import User
 
 # Create your models here.
 class Course(models.Model):
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=150, verbose_name='название')
     preview = models.ImageField(verbose_name='изображение', null=True, blank=True)
     description = models.TextField(verbose_name='описание')
@@ -18,6 +20,7 @@ class Course(models.Model):
         verbose_name_plural = 'курсы'
 
 class Lesson(models.Model):
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name="lessons")
     title = models.CharField(max_length=150, verbose_name='название')
     description = models.TextField(verbose_name='описание')
