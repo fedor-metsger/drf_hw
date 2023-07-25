@@ -18,10 +18,11 @@ class Breed(models.Model):
 
 class Dog(models.Model):
     name = models.CharField(max_length=150, verbose_name='кличка')
-    breed = models.ForeignKey(Breed, on_delete=models.CASCADE)
+    breed = models.ForeignKey(Breed, on_delete=models.CASCADE, related_name="dogs")
     photo = models.ImageField(verbose_name='фотография', null=True, blank=True)
     birthdate = models.DateField(verbose_name='дата рождения', null=True, blank=True)
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    published = models.BooleanField(default=False, verbose_name='публичная', null=True, blank=True)
 
     def __str__(self):
         return f'Dog({self.name, self.breed})'
