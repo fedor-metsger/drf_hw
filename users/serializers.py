@@ -8,4 +8,4 @@ class UserSerializer(serializers.ModelSerializer):
     payments = PaymentSerializer(many=True)
     class Meta:
         model = User
-        fields = ["id", "first_name", "last_name", "email", "phone", "city", "payments"]
+        fields = ["id", "first_name", "last_name", "email", "payments"]

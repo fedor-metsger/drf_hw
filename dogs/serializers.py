@@ -10,10 +10,10 @@ class BreedSerializer(serializers.ModelSerializer):
 
 class DogSerializer(serializers.ModelSerializer):
     breed_count = serializers.SerializerMethodField()
-    breed = BreedSerializer()
+    # breed = BreedSerializer()
     class Meta:
         model = Dog
-        fields = ["id", "name", "breed", "breed_count", "breed"]
+        fields = ["id", "name", "owner", "breed", "breed_count"]
 
     def get_breed_count(self, instance):
         return Dog.objects.filter(breed=instance.breed).count()
