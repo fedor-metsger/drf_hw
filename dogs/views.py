@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from dogs.models import Breed, Dog, Ancestor
 from dogs.permissions import IsOwner, IsOwnerOrModerator
 from dogs.serializers import BreedSerializer, DogSerializer, AncestorSerializer, BreedRetrieveSerializer
+from dogs.paginators import DogPaginator
 
 
 class BreedViewSet(viewsets.ModelViewSet):
@@ -26,6 +27,7 @@ class DogListAPIView(generics.ListAPIView):
     serializer_class = DogSerializer
     # queryset = Dog.objects.all()
     permission_classes = [IsAuthenticated]
+    pagination_class = DogPaginator
 
     def get_queryset(self):
         if "moderator" in [i.name for i in self.request.user.groups.all()]:
