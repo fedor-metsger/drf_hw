@@ -2,6 +2,8 @@
 from rest_framework import serializers
 
 from dogs.models import Breed, Dog, Ancestor
+from dogs.validators import DogNameValidator
+
 
 class BreedSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,6 +16,7 @@ class DogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dog
         fields = ["id", "name", "owner", "breed", "breed_count"]
+        validators = [DogNameValidator(field="name")]
 
     def get_breed_count(self, instance):
         return Dog.objects.filter(breed=instance.breed).count()

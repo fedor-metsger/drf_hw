@@ -2,7 +2,6 @@
 from django.db import models
 
 from config import settings
-from users.models import User
 
 # Create your models here.
 class Course(models.Model):
@@ -13,7 +12,6 @@ class Course(models.Model):
 
     def __str__(self):
         return f'Course({self.title})'
-        # return self.name
 
     class Meta:
         verbose_name = 'курс'
@@ -29,7 +27,6 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f'Lesson({self.title})'
-        # return self.name
 
     class Meta:
         verbose_name = 'урок'
@@ -59,3 +56,7 @@ class Payment(models.Model):
     class Meta:
         verbose_name = 'платёж'
         verbose_name_plural = 'платежи'
+
+class Subscription(models.Model):
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name="subscriptions")
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name="subscriptions")
