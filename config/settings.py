@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_filters",
 
+    "django_celery_beat",
+
     "drf_yasg",
 
     "rest_framework",
@@ -151,3 +153,15 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=600),
 }
+
+EMAIL_HOST = "smtp.yandex.ru"
+EMAIL_PORT = 465
+EMAIL_HOST_USER = "fuckup@oscarbot.ru"
+EMAIL_HOST_PASSWORD = "AsTSNVv7pun9"
+EMAIL_USE_SSL = True
+
+CELERY_BROKER_URL = 'redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@localhost:6379/0'
+CELERY_TIMEZONE = "Europe/Moscow"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60

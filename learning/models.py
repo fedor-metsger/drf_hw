@@ -104,10 +104,11 @@ class Intent(models.Model):
     pi_id = models.CharField(max_length=50, verbose_name='id')
     amount = models.PositiveIntegerField(verbose_name='сумма')
     secret = models.CharField(max_length=100, verbose_name="scient secret")
+    status = models.CharField(max_length=50, verbose_name="статус")
 
     def __str__(self):
         return f'Link({self.pi_id})'
 
     class Meta:
-        verbose_name = 'client secret'
-        verbose_name_plural = 'client secrets'
+        verbose_name = 'статус'
+        verbose_name_plural = 'статусы'

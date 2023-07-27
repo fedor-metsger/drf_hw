@@ -101,11 +101,13 @@ def get_or_create_pi(course_id, user_id, amount):
     if response.status_code == 200:
         pi_id = response.json()["id"]
         secret = response.json()["client_secret"]
+        status = response.json()["status"]
         pi = Intent(
             course_id=course_id,
             user_id=user_id,
             pi_id=pi_id,
             secret=secret,
+            status=status,
             amount=amount
         )
         pi.save()

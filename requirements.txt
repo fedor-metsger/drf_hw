@@ -8,3 +8,6 @@ coverage
 requests
 drf-yasg
 openapi
+celery
+django-celery-beat
+redis
