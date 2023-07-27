@@ -97,3 +97,17 @@ class Link(models.Model):
     class Meta:
         verbose_name = 'ссылка'
         verbose_name_plural = 'ссылки'
+
+class Intent(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    user = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    pi_id = models.CharField(max_length=50, verbose_name='id')
+    amount = models.PositiveIntegerField(verbose_name='сумма')
+    secret = models.CharField(max_length=100, verbose_name="scient secret")
+
+    def __str__(self):
+        return f'Link({self.pi_id})'
+
+    class Meta:
+        verbose_name = 'client secret'
+        verbose_name_plural = 'client secrets'

@@ -1,7 +1,7 @@
 
 import requests
 
-from learning.models import Course, Product, Price, Link
+from learning.models import Course, Product, Price, Link, Intent
 
 STRIPE_USERNAME="sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 
@@ -80,3 +80,50 @@ def get_or_create_payment_link(price_id, user_id):
         return link.pk, link.link_id, link.url
 
     return None, response.status_code, None
+
+def get_or_create_pi(course_id, user_id, amount):
+
+    if Intent.objects.filter(course_id=course_id, user_id=user_id).exists():
+        pi = Intent.objects.filter(course_id=course_id, user_id=user_id).get()
+        return pi.pk, pi.pi_id
+
+    session = requests.Session()
+    session.auth = (STRIPE_USERNAME, "")
+    response = session.post(
+        "https://api.stripe.com/v1/payment_intents",
+        headers={"Authorization": "Basic c2tfdGVzdF80ZUMzOUhxTHlqV0Rhcmp0VDF6ZHA3ZGM6"},
+        data={
+            "amount": amount,
+            "currency": "rub",
+            "payment_method_types[]": "card"
+        }
+    )
+    if response.status_code == 200:
+        pi_id = response.json()["id"]
+        secret = response.json()["client_secret"]
+        pi = Intent(
+            course_id=course_id,
+            user_id=user_id,
+            pi_id=pi_id,
+            secret=secret,
+            amount=amount
+        )
+        pi.save()
+        return pi.pk, pi.pi_id
+    else:
+        return None, response.status_code
+
+def retrieve_pi(pi_id):
+
+    session = requests.Session()
+    session.auth = (STRIPE_USERNAME, "")
+    response = session.post(
+        f'https://api.stripe.com/v1/payment_intents/{pi_id}',
+        headers={"Authorization": "Basic c2tfdGVzdF80ZUMzOUhxTHlqV0Rhcmp0VDF6ZHA3ZGM6"},
+    )
+    if response.status_code == 200:
+        pi_id = response.json()["id"]
+        pi_status = response.json()["status"]
+        return pi_id, pi_status
+    else:
+        return None, response.status_code

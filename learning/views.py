@@ -6,11 +6,14 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from learning.models import Course, Lesson, Payment, Subscription
+from learning.models import Course, Lesson, Payment, Subscription, Intent
 from learning.paginators import MyPaginator
 from learning.permissions import NotModerator, IsOwnerOrModerator, LessonPermission
 from learning.serializers import CourseSerializer, LessonSerializer, PaymentSerializer
-from learning.services import get_or_create_product, get_or_create_price, get_or_create_payment_link
+from learning.services import get_or_create_product, get_or_create_price, get_or_create_payment_link, get_or_create_pi, \
+    retrieve_pi
+from learning.tasks import send_course_update_alert
+from users.models import User
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -93,6 +96,20 @@ class Subscribe(generics.CreateAPIView):
             s.save()
         return Response(status=201)
 
+class Renew(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, course_id=None):
+
+        course = Course.objects.filter(pk=course_id).get()
+        subs = Subscription.objects.filter(course_id=course_id)
+
+        for s in subs:
+            u = User.objects.filter(pk=s.user_id).get()
+            send_course_update_alert.delay(course.title, u.email)
+
+        return Response(status=201)
+
 class Unsubscribe(generics.DestroyAPIView):
     permission_classes = [IsAuthenticated]
 
@@ -134,6 +151,39 @@ class Price(generics.RetrieveAPIView):
             status=200
         )
 
+class CreatePI(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id):
+
+        course = Course.objects.filter(pk=course_id).get()
+        pi_pk, pi_id = get_or_create_pi(course_id, request.user.pk, course.price)
+        if not pi_pk:
+            return Response(status=pi_id)
+
+        return Response(
+            {"pk": pi_pk, "id": pi_id},
+            status=200
+        )
+
+class RetrievePI(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id):
+
+        course = Course.objects.filter(pk=course_id).get()
+        pi = Intent.objects.filter(course_id=course_id, user_id=request.user.pk).first()
+        if not pi:
+            return Response(status=404)
+
+        pi_id, pi_status = retrieve_pi(pi.pi_id)
+        if not pi_id:
+            return Response(status=pi_status)
+
+        return Response(
+            {"pk": pi.pk, "id": pi_id, "status": pi_status},
+            status=200
+        )
 
 class PaymentLink(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]

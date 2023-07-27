@@ -6,7 +6,7 @@ from learning.apps import LearningConfig
 
 from learning.views import CourseViewSet, LessonViewSet, CourseListAPIView, CourseCreateAPIView, \
     CourseRetrieveAPIView, CourseUpdateAPIView, CourseDestroyAPIView, PaymentListAPIView, Unsubscribe, Subscribe, \
-    Product, Price, PaymentLink
+    Product, Price, PaymentLink, Renew, CreatePI, RetrievePI
 
 app_name = LearningConfig.name
 
@@ -28,6 +28,10 @@ urlpatterns = [
     path('course/<int:course_id>/product/', Product.as_view(), name='course_product'),
     path('course/<int:course_id>/price/', Price.as_view(), name='course_price'),
     path('course/<int:course_id>/payment_link/', PaymentLink.as_view(), name='course_price'),
+    path('course/<int:course_id>/create_pi/', CreatePI.as_view(), name='pi_create'),
+    path('course/<int:course_id>/retrieve_pi/', RetrievePI.as_view(), name='pi_retrieve'),
+
+    path('course/<int:course_id>/renew/', Renew.as_view(), name='course_renew'),
 
     path('', include(lesson_router.urls)),
 
