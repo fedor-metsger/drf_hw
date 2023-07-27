@@ -5,3 +5,6 @@ psycopg2
 django-filter
 djangorestframework-simplejwt
 coverage
+requests
+drf-yasg
+openapi

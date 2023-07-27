@@ -25,7 +25,6 @@ class BreedRetrieveAPIView(generics.RetrieveAPIView):
 
 class DogListAPIView(generics.ListAPIView):
     serializer_class = DogSerializer
-    # queryset = Dog.objects.all()
     permission_classes = [IsAuthenticated]
     pagination_class = DogPaginator
 
