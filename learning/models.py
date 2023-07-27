@@ -9,6 +9,7 @@ class Course(models.Model):
     title = models.CharField(max_length=150, verbose_name='название')
     preview = models.ImageField(verbose_name='изображение', null=True, blank=True)
     description = models.TextField(verbose_name='описание')
+    price = models.PositiveIntegerField(default=0, blank=True, null=True, verbose_name="цена")
 
     def __str__(self):
         return f'Course({self.title})'
@@ -60,3 +61,39 @@ class Payment(models.Model):
 class Subscription(models.Model):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name="subscriptions")
     course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name="subscriptions")
+
+class Product(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    prod_id = models.CharField(max_length=50, verbose_name='id')
+
+    def __str__(self):
+        return f'Product({self.prod_id})'
+
+    class Meta:
+        verbose_name = 'продукт'
+        verbose_name_plural = 'продукты'
+
+class Price(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    price_id = models.CharField(max_length=50, verbose_name='id')
+    amount = models.PositiveIntegerField(verbose_name='сумма')
+
+    def __str__(self):
+        return f'Price({self.price_id})'
+
+    class Meta:
+        verbose_name = 'цена'
+        verbose_name_plural = 'цены'
+
+class Link(models.Model):
+    price = models.ForeignKey(Price, on_delete=models.CASCADE)
+    user = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    link_id = models.CharField(max_length=50, verbose_name='id')
+    url = models.CharField(max_length=200, verbose_name='url')
+
+    def __str__(self):
+        return f'Link({self.link_id})'
+
+    class Meta:
+        verbose_name = 'ссылка'
+        verbose_name_plural = 'ссылки'

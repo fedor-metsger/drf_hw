@@ -10,6 +10,7 @@ from learning.models import Course, Lesson, Payment, Subscription
 from learning.paginators import MyPaginator
 from learning.permissions import NotModerator, IsOwnerOrModerator, LessonPermission
 from learning.serializers import CourseSerializer, LessonSerializer, PaymentSerializer
+from learning.services import get_or_create_product, get_or_create_price, get_or_create_payment_link
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -83,6 +84,8 @@ class PaymentListAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
 class Subscribe(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+
     def create(self, request, course_id=None):
         user_id = request.user.pk
         if not Subscription.objects.filter(user_id=user_id, course_id=course_id).exists():
@@ -91,8 +94,72 @@ class Subscribe(generics.CreateAPIView):
         return Response(status=201)
 
 class Unsubscribe(generics.DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
     def delete(self, request, course_id):
         user_id = request.user.pk
         Subscription.objects.filter(user_id=user_id, course_id=course_id).delete()
         return Response(status=204)
+
+class Product(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id):
+
+        prod_pk, prod_id = get_or_create_product(course_id)
+        if not prod_pk:
+            return Response(status=prod_id)
+
+        return Response(
+            {"pk": prod_pk, "id": prod_id},
+            status=200
+        )
+
+class Price(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id):
+
+        course = Course.objects.filter(pk=course_id).get()
+        prod_pk, prod_id = get_or_create_product(course_id)
+        if not prod_pk:
+            return Response(status=prod_id)
+
+        price_pk, price_id = get_or_create_price(prod_pk, course.price * 100)
+        if not price_pk:
+            return Response(status=price_id)
+
+        return Response(
+            {"pk": price_pk, "id": price_id},
+            status=200
+        )
+
+
+class PaymentLink(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id):
+
+        course = Course.objects.filter(pk=course_id).get()
+
+        prod_pk, prod_id = get_or_create_product(course_id)
+        if not prod_pk:
+            return Response(status=prod_id)
+
+        price_pk, price_id = get_or_create_price(prod_pk, course.price * 100)
+        if not price_pk:
+            return Response(status=price_id)
+
+        link_pk, link_id, link_url = get_or_create_payment_link(price_pk, request.user.id)
+        if not link_pk:
+            return Response(status=link_id)
+
+        return Response(
+            {
+                "prod_pk": prod_pk, "prod_id": prod_id,
+                "price_pk": price_pk, "price_id": price_id,
+                "link_pk": link_pk, "link_id": link_id, "url": link_url
+            },
+            status=200
+        )
 
