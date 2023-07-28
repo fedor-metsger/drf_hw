@@ -1,9 +1,8 @@
 
 import requests
 
+from learning.config import STRIPE_PRODUCTS_URL, STRIPE_TOKEN, STRIPE_LINKS_URL, STRIPE_PRICES_URL, STRIPE_USERNAME
 from learning.models import Course, Product, Price, Link
-
-STRIPE_USERNAME="sk_test_4eC39HqLyjWDarjtT1zdp7dc"
 
 def get_or_create_product(course_id):
 
@@ -15,8 +14,8 @@ def get_or_create_product(course_id):
     session = requests.Session()
     session.auth = (STRIPE_USERNAME, "")
     response = session.post(
-        "https://api.stripe.com/v1/products",
-        headers={"Authorization": "Basic c2tfdGVzdF80ZUMzOUhxTHlqV0Rhcmp0VDF6ZHA3ZGM6"},
+        STRIPE_PRODUCTS_URL,
+        headers={"Authorization": f"Basic {STRIPE_TOKEN}"},
         data={"name": f'Course "{course.title}"'}
     )
     if response.status_code == 200:
@@ -38,8 +37,8 @@ def get_or_create_price(product_id, amount):
     session = requests.Session()
     session.auth = (STRIPE_USERNAME, "")
     response = session.post(
-        "https://api.stripe.com/v1/prices",
-        headers={"Authorization": "Basic c2tfdGVzdF80ZUMzOUhxTHlqV0Rhcmp0VDF6ZHA3ZGM6"},
+        STRIPE_PRICES_URL,
+        headers={"Authorization": f"Basic {STRIPE_TOKEN}"},
         data={
             "unit_amount": amount,
             "currency": "rub",
@@ -64,8 +63,8 @@ def get_or_create_payment_link(price_id, user_id):
     session = requests.Session()
     session.auth = (STRIPE_USERNAME, "")
     response = session.post(
-        "https://api.stripe.com/v1/payment_links",
-        headers={"Authorization": "Basic c2tfdGVzdF80ZUMzOUhxTHlqV0Rhcmp0VDF6ZHA3ZGM6"},
+        STRIPE_LINKS_URL,
+        headers={"Authorization": f"Basic {STRIPE_TOKEN}"},
         data={
             "line_items[0][price]": price.price_id,
             "line_items[0][quantity]": 1

@@ -162,4 +162,3 @@ class PaymentLink(generics.RetrieveAPIView):
             },
             status=200
         )
-

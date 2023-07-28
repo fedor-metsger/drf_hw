@@ -40,4 +40,3 @@ class LessonPermission(BasePermission):
             return obj.owner == request.user and not "moderator" in [i.name for i in request.user.groups.all()]
         else:
             return False
-
