@@ -23,6 +23,7 @@ class Dog(models.Model):
     birthdate = models.DateField(verbose_name='дата рождения', null=True, blank=True)
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     published = models.BooleanField(default=False, verbose_name='публичная', null=True, blank=True)
+    price = models.IntegerField(default=0, blank=True, null=True)
 
     def __str__(self):
         return f'Dog({self.name, self.breed})'
